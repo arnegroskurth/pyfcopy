@@ -33,9 +33,8 @@ def copy(
     if block_size < 1:
         raise ValueError(f"Invalid block-size: {block_size}")
 
-    target.touch(mode=source.stat().st_mode)
-
-    file_size = source.stat().st_size
+    source_stat = source.stat()
+    file_size = source_stat.st_size
 
     progress_listener.start(file_size)
 
@@ -53,6 +52,8 @@ def copy(
 
     os.close(target_fd)
     os.close(source_fd)
+
+    target.chmod(mode=source_stat.st_mode)
 
     progress_listener.end()
 

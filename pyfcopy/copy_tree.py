@@ -40,7 +40,8 @@ def copy_tree(
 
     tree_progress_listener.begin(relative_paths)
 
-    target.mkdir(mode=source.stat().st_mode)
+    target.mkdir()
+    target.chmod(source.stat().st_mode)
 
     for current_relative_path in relative_paths:
 
@@ -56,14 +57,12 @@ def copy_tree(
 
         elif current_source_path.is_dir():
 
-            current_target_path.mkdir(mode=current_source_path.stat().st_mode)
+            current_target_path.mkdir()
+            current_target_path.chmod(current_source_path.stat().st_mode)
 
         else:
 
             raise Exception()
-
-        # set permissions created directory/file
-        current_target_path.chmod(current_source_path.stat().st_mode)
 
     tree_progress_listener.finish()
 
