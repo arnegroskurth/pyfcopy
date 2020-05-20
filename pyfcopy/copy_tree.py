@@ -1,6 +1,6 @@
 
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 
 from pyfcopy import copy
 from pyfcopy.dummy_progress import DummyTreeProgressListener
