@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "pyfcopy"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+repository = "https://github.com/arnegroskurth/pyfcopy"
+documentation = "https://github.com/arnegroskurth/pyfcopy/doc/"
+keywords = [
+    "File",
+    "Tree",
+    "Filesystem",
+    "Copy",
+    "Move",
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.1"
+pytest-dependency = "^0.5.1"
+
+[tool.poetry.urls]
+issues = "https://github.com/arnegroskurth/pyfcopy/issues"
