@@ -7,6 +7,7 @@ authors = [
     "Arne Groskurth <arne.groskurth@gears9.de>",
 ]
 readme = "README.md"
+homepage = "https://github.com/arnegroskurth/pyfcopy"
 repository = "https://github.com/arnegroskurth/pyfcopy"
 documentation = "https://github.com/arnegroskurth/pyfcopy/doc/"
 keywords = [
