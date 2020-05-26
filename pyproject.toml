@@ -2,8 +2,10 @@
 name = "pyfcopy"
 license = "MIT"
 version = "0.1.0"
-description = ""
-authors = []
+description = "Provides high-level functionality on the filesystem."
+authors = [
+    "Arne Groskurth <arne.groskurth@gears9.de>",
+]
 readme = "README.md"
 repository = "https://github.com/arnegroskurth/pyfcopy"
 documentation = "https://github.com/arnegroskurth/pyfcopy/doc/"
