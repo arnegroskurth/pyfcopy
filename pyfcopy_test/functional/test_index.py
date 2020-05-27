@@ -18,7 +18,7 @@ def test_empty(tmp_path: Path):
 
     paths = index(tmp_path)
 
-    assert_same_index(paths, ["."])
+    assert_same_index(paths, {"."})
 
 
 def test_circular_symlink(tmp_path: Path):
@@ -27,7 +27,7 @@ def test_circular_symlink(tmp_path: Path):
 
     paths = index(tmp_path)
 
-    assert_same_index(paths, [".", "a-symlink"])
+    assert_same_index(paths, {".", "a-symlink"})
 
 
 def test_file_path(tmp_path: Path):
@@ -36,12 +36,12 @@ def test_file_path(tmp_path: Path):
 
     assert_same_index(
         index(tmp_path / "file.ext", absolute=True),
-        [tmp_path / "file.ext"]
+        {tmp_path / "file.ext"}
     )
 
     assert_same_index(
         index(tmp_path / "file.ext", absolute=False),
-        ["."]
+        {"."}
     )
 
 
@@ -56,7 +56,7 @@ def test_simple(tmp_path: Path):
 
     paths = index(tmp_path, order=Order.PRE)
 
-    assert_same_index(paths, [
+    assert_same_index(paths, {
         ".",
         'dir1',
         'dir1/file2',
@@ -64,7 +64,7 @@ def test_simple(tmp_path: Path):
         'dir2/dir3',
         'dir2/dir3/file3',
         'file1',
-    ])
+    })
 
 
 def test_order(tmp_path: Path):
@@ -92,20 +92,20 @@ def test_absolute_path(tmp_path: Path):
 
     (tmp_path / "file.ext").touch()
 
-    assert_same_index(index(tmp_path, absolute=False), [
+    assert_same_index(index(tmp_path, absolute=False), {
         ".",
         "file.ext",
-    ])
+    })
 
-    assert_same_index(index(tmp_path, absolute=True), [
+    assert_same_index(index(tmp_path, absolute=True), {
         tmp_path,
         tmp_path / "file.ext",
-    ])
+    })
 
 
 def test_root_exclusion(tmp_path: Path):
 
     (tmp_path / "some-dir").mkdir()
 
-    assert_same_index(index(tmp_path / "some-dir", include_root=False), [])
-    assert_same_index(index(tmp_path / "some-dir", include_root=True), ["."])
+    assert_same_index(index(tmp_path / "some-dir", include_root=False), set())
+    assert_same_index(index(tmp_path / "some-dir", include_root=True), {"."})

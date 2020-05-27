@@ -15,7 +15,7 @@ def test_empty(tmp_path: Path):
 
     merge(tmp_path / "source", tmp_path / "target")
 
-    assert_same_index(index(tmp_path / "target"), ["."])
+    assert_same_index(index(tmp_path / "target"), {"."})
 
 
 @pytest.mark.parametrize("relative_path", ["file", "symlink", "non-existent", "target"])
