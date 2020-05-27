@@ -80,6 +80,6 @@ def merge(
 
         else:
 
-            raise Exception(f"Cannot handle path: {str(current_source_path)}")
+            raise Exception(f"Cannot handle path: {current_source_path}")
 
     tree_progress_listener.finish()

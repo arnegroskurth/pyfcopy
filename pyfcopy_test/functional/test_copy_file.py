@@ -20,7 +20,7 @@ def test_copy(data: bytes, file_permissions: int, block_size: int, tmp_path: Pat
 
     progress_listener = FileProgressListenerTester(1)
 
-    copied_byte_count = copy_file(str(source), str(target), block_size=block_size, progress_listener=progress_listener)
+    copied_byte_count = copy_file(source, target, block_size=block_size, progress_listener=progress_listener)
 
     progress_listener.assert_consistent_run()
 
@@ -54,7 +54,7 @@ def test_already_existing_target_path(tmp_path: Path):
 
     with pytest.raises(ValueError):
 
-        copy_file(str(source), str(target))
+        copy_file(source, target)
 
 
 @pytest.mark.parametrize("block_size", [0, -1, -5])
@@ -67,4 +67,4 @@ def test_invalid_block_size(block_size: int, tmp_path: Path):
 
     with pytest.raises(ValueError):
 
-        copy_file(str(source), str(target), block_size=block_size)
+        copy_file(source, target, block_size=block_size)
