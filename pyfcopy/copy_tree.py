@@ -1,6 +1,6 @@
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from pyfcopy import copy
 from pyfcopy.dummy_progress import DummyTreeProgressListener
@@ -8,47 +8,47 @@ from pyfcopy.progress import TreeProgressListener, FileProgressListener
 
 
 def copy_tree(
-        source_path: str,
-        target_path: str,
+        source_path: Union[Path, str],
+        target_path: Union[Path, str],
         *,
         tree_progress_listener: Optional[TreeProgressListener] = None,
         file_progress_listener: Optional[FileProgressListener] = None,
         block_size: Optional[int] = None,
 ) -> int:
 
+    source_path = Path(source_path) if not isinstance(source_path, Path) else source_path
+    target_path = Path(target_path) if not isinstance(target_path, Path) else target_path
+
     tree_progress_listener = DummyTreeProgressListener() if tree_progress_listener is None else tree_progress_listener
 
-    source = Path(source_path)
-    target = Path(target_path)
-
-    if not source.is_dir():
+    if not source_path.is_dir():
         raise ValueError(f"Given source-path is not a directory: {source_path}")
 
-    if source.is_symlink():
+    if source_path.is_symlink():
         raise ValueError(f"Given source-path is a symlink: {source_path}")
 
-    if target.exists():
+    if target_path.exists():
         raise ValueError(f"Given target-path does already exist: {target_path}")
 
-    if str(target.resolve()).startswith(str(source.resolve())):
+    if str(target_path.resolve()).startswith(str(source_path.resolve())):
         raise ValueError("Cannot copy tree into itself.")
 
     relative_paths = [
-        str(absolute_path)[len(source_path) + 1:]
-        for absolute_path in source.rglob("*")
+        str(absolute_path.relative_to(source_path))
+        for absolute_path in source_path.rglob("*")
     ]
 
     tree_progress_listener.begin(relative_paths)
 
-    target.mkdir()
-    target.chmod(source.stat().st_mode)
+    target_path.mkdir()
+    target_path.chmod(source_path.stat().st_mode)
 
     for current_relative_path in relative_paths:
 
         tree_progress_listener.next(current_relative_path)
 
-        current_source_path = source / current_relative_path
-        current_target_path = target / current_relative_path
+        current_source_path = source_path / current_relative_path
+        current_target_path = target_path / current_relative_path
 
         if current_source_path.is_file():
 

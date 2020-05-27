@@ -1,39 +1,39 @@
 
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from pyfcopy.dummy_progress import DummyFileProgressListener
 from pyfcopy.progress import FileProgressListener
 
 
 def copy(
-        source_path: str,
-        target_path: str,
+        source_path: Union[Path, str],
+        target_path: Union[Path, str],
         *,
         progress_listener: Optional[FileProgressListener] = None,
         block_size: Optional[int] = None,
     ) -> int:
 
-    block_size = pow(2, 16) if block_size is None else block_size
+    source_path = Path(source_path) if not isinstance(source_path, Path) else source_path
+    target_path = Path(target_path) if not isinstance(target_path, Path) else target_path
+
     progress_listener = DummyFileProgressListener() if progress_listener is None else progress_listener
+    block_size = pow(2, 16) if block_size is None else block_size
 
-    source = Path(source_path)
-    target = Path(target_path)
-
-    if not source.is_file():
+    if not source_path.is_file():
         raise ValueError(f"Given source-path is not a file: {source_path}")
 
-    if source.is_symlink():
+    if source_path.is_symlink():
         raise ValueError(f"Cannot copy symlink: {source_path}")
 
-    if target.exists():
+    if target_path.exists():
         raise ValueError(f"Given target-path does already exist: {target_path}")
 
     if block_size < 1:
         raise ValueError(f"Invalid block-size: {block_size}")
 
-    source_stat = source.stat()
+    source_stat = source_path.stat()
     file_size = source_stat.st_size
 
     progress_listener.start(file_size)
@@ -53,7 +53,7 @@ def copy(
     os.close(target_fd)
     os.close(source_fd)
 
-    target.chmod(mode=source_stat.st_mode)
+    target_path.chmod(mode=source_stat.st_mode)
 
     progress_listener.end()
 
