@@ -10,7 +10,7 @@ from pyfcopy_test.tree_fixture import prepare_tree
 from pyfcopy_test.tree_progress_listener_tester import TreeProgressListenerTester
 
 
-def test_copy_tree(tmp_path):
+def test_copy_tree(tmp_path: Path):
 
     prepare_tree(
         tmp_path,
@@ -51,13 +51,13 @@ def test_copy_tree(tmp_path):
 
 
 @pytest.mark.parametrize("relative_path", [".", "..", "a-file", "non-existent", "a-file-symlink", "a-dir-symlink"])
-def test_invalid_source_path(relative_path: str, tmp_path):
+def test_invalid_source_path(relative_path: str, tmp_path: Path):
 
-    Path(tmp_path / "a-file").touch()
-    Path(tmp_path / "a-dir").mkdir()
+    (tmp_path / "a-file").touch()
+    (tmp_path / "a-dir").mkdir()
 
-    Path(tmp_path / "a-dir-symlink").symlink_to(tmp_path / "a-dir")
-    Path(tmp_path / "a-file-symlink").symlink_to(tmp_path / "a-file")
+    (tmp_path / "a-dir-symlink").symlink_to(tmp_path / "a-dir")
+    (tmp_path / "a-file-symlink").symlink_to(tmp_path / "a-file")
 
     with pytest.raises(ValueError):
 

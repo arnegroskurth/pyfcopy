@@ -5,7 +5,7 @@ from typing import Dict
 
 
 def prepare_tree(
-        base_path: str,
+        base_path: Path,
         *,
         directory_map: Dict[str, int] = None,
         file_map: Dict[str, int] = None,
@@ -19,20 +19,20 @@ def prepare_tree(
     directory_map = {} if directory_map is None else directory_map
     file_map = {} if file_map is None else file_map
 
-    assert Path(base_path).is_dir()
+    assert base_path.is_dir()
 
     for relative_path, file_permissions in directory_map.items():
 
         assert file_permissions >= 0o000
         assert file_permissions <= 0o777
 
-        path = Path(os.path.join(base_path, normalize_path(relative_path)))
+        path = base_path / normalize_path(relative_path)
         path.mkdir()
         path.chmod(file_permissions)
 
     for relative_path, file_permissions in file_map.items():
 
-        path = Path(os.path.join(base_path, normalize_path(relative_path)))
+        path = base_path / normalize_path(relative_path)
 
         assert not path.exists()
         assert path.parent.is_dir()

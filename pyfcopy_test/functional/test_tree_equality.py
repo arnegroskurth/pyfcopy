@@ -8,7 +8,7 @@ from pyfcopy_test.tree_fixture import prepare_tree
 
 @pytest.mark.dependency(name="test_equal_files")
 @pytest.mark.parametrize("path_b", ["a.ext", "b.ext"])
-def test_equal_files(path_b: str, tmp_path):
+def test_equal_files(path_b: str, tmp_path: Path):
 
     prepare_tree(
         tmp_path,
@@ -20,18 +20,18 @@ def test_equal_files(path_b: str, tmp_path):
         empty_files=True
     )
 
-    Path(tmp_path / "a.ext").write_text("foo")
-    Path(tmp_path / "b.ext").write_text("foo")
+    (tmp_path / "a.ext").write_text("foo")
+    (tmp_path / "b.ext").write_text("foo")
 
     _assert_equal_files(
-        Path(tmp_path / "a.ext"),
-        Path(tmp_path / path_b)
+        tmp_path / "a.ext",
+        tmp_path / path_b
     )
 
 
 @pytest.mark.dependency(name="test_unequal_files")
 @pytest.mark.parametrize("path_b", ["b.ext", "c.ext"])
-def test_unequal_files(path_b: str, tmp_path):
+def test_unequal_files(path_b: str, tmp_path: Path):
 
     prepare_tree(
         tmp_path,
@@ -43,18 +43,18 @@ def test_unequal_files(path_b: str, tmp_path):
         empty_files=True
     )
 
-    Path(tmp_path / "b.ext").write_text("foo")
+    (tmp_path / "b.ext").write_text("foo")
 
     with pytest.raises(AssertionError):
 
         _assert_equal_files(
-            Path(tmp_path / "a.ext"),
-            Path(tmp_path / path_b)
+            tmp_path / "a.ext",
+            tmp_path / path_b
         )
 
 
 @pytest.mark.dependency(depends=["test_equal_files", "test_unequal_files"])
-def test_equal_trees(tmp_path):
+def test_equal_trees(tmp_path: Path):
 
     prepare_tree(
         tmp_path,
@@ -87,7 +87,7 @@ def test_equal_trees(tmp_path):
 
 @pytest.mark.dependency(depends=["test_equal_files", "test_unequal_files"])
 @pytest.mark.parametrize("path_b", ["b", "c", "d", "e"])
-def test_unequal_trees(path_b: str, tmp_path):
+def test_unequal_trees(path_b: str, tmp_path: Path):
 
     prepare_tree(
         tmp_path,

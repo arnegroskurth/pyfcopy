@@ -10,10 +10,10 @@ from pyfcopy_test.file_progress_listener_tester import FileProgressListenerTeste
 @pytest.mark.parametrize("data", [b"", b"Hello World"])
 @pytest.mark.parametrize("file_permissions", [0o664, 0o764])
 @pytest.mark.parametrize("block_size", [1, 5, 10])
-def test_copy(data: bytes, file_permissions: int, block_size: int, tmp_path):
+def test_copy(data: bytes, file_permissions: int, block_size: int, tmp_path: Path):
 
-    source = Path(tmp_path / "file.ext")
-    target = Path(tmp_path / "target.ext")
+    source = tmp_path / "file.ext"
+    target = tmp_path / "target.ext"
 
     source.write_bytes(data)
     source.chmod(file_permissions)
@@ -31,23 +31,23 @@ def test_copy(data: bytes, file_permissions: int, block_size: int, tmp_path):
 
 
 @pytest.mark.parametrize("relative_path", ["", ".", "..", "non-existent", "a-dir", "a-dir-symlink", "a-file-symlink"])
-def test_invalid_source_path(relative_path: str, tmp_path):
+def test_invalid_source_path(relative_path: str, tmp_path: Path):
 
-    Path(tmp_path / "a-file").touch()
-    Path(tmp_path / "a-dir").mkdir()
+    (tmp_path / "a-file").touch()
+    (tmp_path / "a-dir").mkdir()
 
-    Path(tmp_path / "a-dir-symlink").symlink_to(tmp_path / "a-dir")
-    Path(tmp_path / "a-file-symlink").symlink_to(tmp_path / "a-file")
+    (tmp_path / "a-dir-symlink").symlink_to(tmp_path / "a-dir")
+    (tmp_path / "a-file-symlink").symlink_to(tmp_path / "a-file")
 
     with pytest.raises(ValueError):
 
         copy(tmp_path / relative_path, tmp_path / "target")
 
 
-def test_already_existing_target_path(tmp_path):
+def test_already_existing_target_path(tmp_path: Path):
 
-    source = Path(tmp_path / "file.ext")
-    target = Path(tmp_path / "target.ext")
+    source = tmp_path / "file.ext"
+    target = tmp_path / "target.ext"
 
     source.touch()
     target.touch()
@@ -58,10 +58,10 @@ def test_already_existing_target_path(tmp_path):
 
 
 @pytest.mark.parametrize("block_size", [0, -1, -5])
-def test_invalid_block_size(block_size: int, tmp_path):
+def test_invalid_block_size(block_size: int, tmp_path: Path):
 
-    source = Path(tmp_path / "file.ext")
-    target = Path(tmp_path / "target.ext")
+    source = tmp_path / "file.ext"
+    target = tmp_path / "target.ext"
 
     source.touch()
 

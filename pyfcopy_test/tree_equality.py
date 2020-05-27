@@ -20,8 +20,8 @@ def _assert_tree_is_contained_in(a: Path, b: Path) -> None:
 
     for child_name in children:
 
-        child_a = Path(a / child_name)
-        child_b = Path(b / child_name)
+        child_a = a / child_name
+        child_b = b / child_name
 
         assert child_a.exists()
         assert child_b.exists()
