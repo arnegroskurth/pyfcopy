@@ -10,13 +10,22 @@ from pyfcopy_test.tree_fixture import prepare_tree
 from pyfcopy_test.tree_progress_listener_tester import TreeProgressListenerTester
 
 
-def testcopy_file(tmp_path: Path):
+def test_copy_file(tmp_path: Path):
 
     (tmp_path / "file.ext").touch()
 
     copy(tmp_path / "file.ext", tmp_path / "file2.ext")
 
     assert (tmp_path / "file2.ext").is_file()
+
+
+def test_copy_dir(tmp_path: Path):
+
+    (tmp_path / "dir").mkdir()
+
+    copy(tmp_path / "dir", tmp_path / "target")
+
+    assert (tmp_path / "target").is_dir()
 
 
 def test_copy_tree(tmp_path: Path):
@@ -73,10 +82,11 @@ def test_invalid_source_path(relative_path: str, tmp_path: Path):
         copy(tmp_path / relative_path, tmp_path / "target")
 
 
-@pytest.mark.parametrize("relative_path", ["", ".", "..", "non-existent"])
-def test_invalid_target_path(relative_path: str, tmp_path):
+@pytest.mark.parametrize("relative_path", ["", ".", ".."])
+def test_invalid_target_path(relative_path: str, tmp_path: Path):
+
+    (tmp_path / "source").touch()
 
     with pytest.raises(ValueError):
 
-        copy(tmp_path / relative_path, tmp_path / "target")
-
+        copy(tmp_path / "source", tmp_path / relative_path)
