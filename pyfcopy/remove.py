@@ -38,7 +38,3 @@ def remove(
             absolute_path.unlink()
 
     tree_progress_listener.finish()
-
-
-def _remove(relative_path: Path, root_path: Path, tree_progress_listener: TreeProgressListener) -> None:
-    pass
