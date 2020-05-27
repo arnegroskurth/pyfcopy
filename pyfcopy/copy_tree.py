@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from .copy import copy
 from .dummy_progress import DummyTreeProgressListener
-from .list_tree import list_tree, Order
+from .index import index, Order
 from .progress import TreeProgressListener, FileProgressListener
 
 
@@ -34,7 +34,7 @@ def copy_tree(
     if str(target_path.resolve()).startswith(str(source_path.resolve())):
         raise ValueError("Cannot copy tree into itself.")
 
-    relative_paths = list_tree(source_path, order=Order.PRE)
+    relative_paths = index(source_path, order=Order.PRE)
 
     tree_progress_listener.begin(relative_paths)
 

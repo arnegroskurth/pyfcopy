@@ -9,7 +9,7 @@ class Order(Enum):
     POST = 2
 
 
-def list_tree(
+def index(
         path: Union[Path, str],
         *,
         absolute: Optional[bool] = None,

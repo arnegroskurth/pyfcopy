@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from .dummy_progress import DummyTreeProgressListener
-from .list_tree import list_tree, Order
+from .index import index, Order
 from .progress import TreeProgressListener
 
 
@@ -19,7 +19,7 @@ def remove(
     if not isinstance(path, Path):
         path = Path(path)
 
-    relative_paths = list_tree(path, order=Order.POST)
+    relative_paths = index(path, order=Order.POST)
 
     tree_progress_listener.begin(relative_paths)
 
