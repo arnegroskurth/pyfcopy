@@ -1,5 +1,6 @@
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import List
 
 
@@ -21,11 +22,11 @@ class FileProgressListener(ABC):
 class TreeProgressListener(ABC):
 
     @abstractmethod
-    def begin(self, relative_paths: List[str]) -> None:
+    def begin(self, relative_paths: List[Path]) -> None:
         pass
 
     @abstractmethod
-    def next(self, relative_path: str) -> None:
+    def next(self, relative_path: Path) -> None:
         pass
 
     @abstractmethod

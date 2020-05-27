@@ -1,4 +1,5 @@
 
+from pathlib import Path
 from typing import List
 
 from pyfcopy.progress import TreeProgressListener, FileProgressListener
@@ -18,10 +19,10 @@ class DummyFileProgressListener(FileProgressListener):
 
 class DummyTreeProgressListener(TreeProgressListener):
 
-    def begin(self, relative_paths: List[str]) -> None:
+    def begin(self, relative_paths: List[Path]) -> None:
         pass
 
-    def next(self, relative_path: str) -> None:
+    def next(self, relative_path: Path) -> None:
         pass
 
     def finish(self) -> None:
