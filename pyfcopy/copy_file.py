@@ -53,8 +53,6 @@ def copy_file(
     os.close(target_fd)
     os.close(source_fd)
 
-    target_path.chmod(mode=source_stat.st_mode)
-
     progress_listener.end()
 
     return current_position

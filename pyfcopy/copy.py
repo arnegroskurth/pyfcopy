@@ -53,7 +53,6 @@ def copy(
         elif current_source_path.is_dir():
 
             current_target_path.mkdir()
-            current_target_path.chmod(current_source_path.stat().st_mode)
 
         else:
 
