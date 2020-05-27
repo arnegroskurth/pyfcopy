@@ -3,8 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from pyfcopy import index
-from pyfcopy.merge import merge
+from pyfcopy import index, merge
 from pyfcopy_test.index_assertions import assert_same_index
 
 
