@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import List
 
-from pyfcopy.progress import TreeProgressListener, FileProgressListener
+from .progress import TreeProgressListener, FileProgressListener
 
 
 class DummyFileProgressListener(FileProgressListener):

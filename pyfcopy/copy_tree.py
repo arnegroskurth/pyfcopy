@@ -2,10 +2,10 @@
 from pathlib import Path
 from typing import Optional, Union
 
-from pyfcopy import copy
-from pyfcopy.dummy_progress import DummyTreeProgressListener
-from pyfcopy.list_tree import list_tree, Order
-from pyfcopy.progress import TreeProgressListener, FileProgressListener
+from .copy import copy
+from .dummy_progress import DummyTreeProgressListener
+from .list_tree import list_tree, Order
+from .progress import TreeProgressListener, FileProgressListener
 
 
 def copy_tree(

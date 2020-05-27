@@ -2,9 +2,8 @@
 from pathlib import Path
 from typing import Optional, Union
 
-from . import list_tree
 from .dummy_progress import DummyTreeProgressListener
-from .list_tree import Order
+from .list_tree import list_tree, Order
 from .progress import TreeProgressListener
 
 

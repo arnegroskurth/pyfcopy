@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 from typing import Optional, Union
 
-from pyfcopy.dummy_progress import DummyFileProgressListener
-from pyfcopy.progress import FileProgressListener
+from .dummy_progress import DummyFileProgressListener
+from .progress import FileProgressListener
 
 
 def copy(
