@@ -5,32 +5,61 @@ import pytest
 
 from pyfcopy import copy
 from pyfcopy_test.file_progress_listener_tester import FileProgressListenerTester
+from pyfcopy_test.tree_equality import assert_equal_trees
+from pyfcopy_test.tree_fixture import prepare_tree
+from pyfcopy_test.tree_progress_listener_tester import TreeProgressListenerTester
 
 
-@pytest.mark.parametrize("data", [b"", b"Hello World"])
-@pytest.mark.parametrize("file_permissions", [0o664, 0o764])
-@pytest.mark.parametrize("block_size", [1, 5, 10])
-def test_copy(data: bytes, file_permissions: int, block_size: int, tmp_path: Path):
+def testcopy_file(tmp_path: Path):
 
-    source = tmp_path / "file.ext"
-    target = tmp_path / "target.ext"
+    (tmp_path / "file.ext").touch()
 
-    source.write_bytes(data)
-    source.chmod(file_permissions)
+    copy(tmp_path / "file.ext", tmp_path / "file2.ext")
 
-    progress_listener = FileProgressListenerTester(1)
-
-    copied_byte_count = copy(str(source), str(target), block_size=block_size, progress_listener=progress_listener)
-
-    progress_listener.assert_consistent_run()
-
-    assert target.read_bytes() == data
-    assert target.lstat().st_mode & 0o777 == file_permissions
-    assert copied_byte_count == len(data)
-    assert progress_listener.last_size == len(data)
+    assert (tmp_path / "file2.ext").is_file()
 
 
-@pytest.mark.parametrize("relative_path", ["", ".", "..", "non-existent", "a-dir", "a-dir-symlink", "a-file-symlink"])
+def test_copy_tree(tmp_path: Path):
+
+    prepare_tree(
+        tmp_path,
+        directory_map={
+            "src": 0o771,
+            "src/empty": 0o777,
+            "src/sub1": 0o775,
+            "src/sub2": 0o755,
+            "src/sub2/sub21": 0o757,
+        },
+        file_map={
+            "src/a.ext": 0o777,
+            "src/sub1/b.ext": 0o775,
+            "src/sub2/sub21/c.ext": 0o757,
+        }
+    )
+
+    source = tmp_path / "src"
+    target = tmp_path / "target"
+
+    tree_progress_listener = TreeProgressListenerTester({
+        ".", "empty", "sub1", "sub2", "sub2/sub21",
+        "a.ext", "sub1/b.ext", "sub2/sub21/c.ext",
+    })
+    file_progress_listener = FileProgressListenerTester()
+
+    copy(
+        str(source),
+        str(target),
+        tree_progress_listener=tree_progress_listener,
+        file_progress_listener=file_progress_listener
+    )
+
+    assert_equal_trees(source, target)
+
+    tree_progress_listener.assert_consistent_run()
+    file_progress_listener.assert_consistent_run()
+
+
+@pytest.mark.parametrize("relative_path", [".", "..", "non-existent", "a-file-symlink", "a-dir-symlink"])
 def test_invalid_source_path(relative_path: str, tmp_path: Path):
 
     (tmp_path / "a-file").touch()
@@ -44,27 +73,10 @@ def test_invalid_source_path(relative_path: str, tmp_path: Path):
         copy(tmp_path / relative_path, tmp_path / "target")
 
 
-def test_already_existing_target_path(tmp_path: Path):
-
-    source = tmp_path / "file.ext"
-    target = tmp_path / "target.ext"
-
-    source.touch()
-    target.touch()
+@pytest.mark.parametrize("relative_path", ["", ".", "..", "non-existent"])
+def test_invalid_target_path(relative_path: str, tmp_path):
 
     with pytest.raises(ValueError):
 
-        copy(str(source), str(target))
+        copy(tmp_path / relative_path, tmp_path / "target")
 
-
-@pytest.mark.parametrize("block_size", [0, -1, -5])
-def test_invalid_block_size(block_size: int, tmp_path: Path):
-
-    source = tmp_path / "file.ext"
-    target = tmp_path / "target.ext"
-
-    source.touch()
-
-    with pytest.raises(ValueError):
-
-        copy(str(source), str(target), block_size=block_size)

@@ -1,6 +1,6 @@
 
 from .copy import copy
-from .copy_tree import copy_tree
+from .copy_file import copy_file
 from .index import index
 from .remove import remove
 

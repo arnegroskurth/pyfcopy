@@ -1,60 +1,65 @@
 
-import os
 from pathlib import Path
 from typing import Optional, Union
 
-from .dummy_progress import DummyFileProgressListener
-from .progress import FileProgressListener
+from .copy_file import copy_file
+from .dummy_progress import DummyTreeProgressListener
+from .index import index, Order
+from .progress import FileProgressListener, TreeProgressListener
 
 
 def copy(
         source_path: Union[Path, str],
         target_path: Union[Path, str],
         *,
-        progress_listener: Optional[FileProgressListener] = None,
+        tree_progress_listener: Optional[TreeProgressListener] = None,
+        file_progress_listener: Optional[FileProgressListener] = None,
         block_size: Optional[int] = None,
-    ) -> int:
+) -> int:
 
     source_path = Path(source_path) if not isinstance(source_path, Path) else source_path
     target_path = Path(target_path) if not isinstance(target_path, Path) else target_path
 
-    progress_listener = DummyFileProgressListener() if progress_listener is None else progress_listener
-    block_size = pow(2, 16) if block_size is None else block_size
+    tree_progress_listener = DummyTreeProgressListener() if tree_progress_listener is None else tree_progress_listener
 
-    if not source_path.is_file():
-        raise ValueError(f"Given source-path is not a file: {source_path}")
+    if not source_path.exists():
+        raise ValueError(f"Given source-path does not exist: {source_path}")
 
     if source_path.is_symlink():
-        raise ValueError(f"Cannot copy symlink: {source_path}")
+        raise ValueError(f"Given source-path is a symlink: {source_path}")
 
     if target_path.exists():
         raise ValueError(f"Given target-path does already exist: {target_path}")
 
-    if block_size < 1:
-        raise ValueError(f"Invalid block-size: {block_size}")
+    if str(target_path.resolve()).startswith(str(source_path.resolve())):
+        raise ValueError("Cannot copy tree into itself.")
 
-    source_stat = source_path.stat()
-    file_size = source_stat.st_size
+    relative_paths = index(source_path, order=Order.PRE)
 
-    progress_listener.start(file_size)
+    tree_progress_listener.begin(relative_paths)
 
-    source_fd = os.open(source_path, os.O_RDONLY)
-    target_fd = os.open(target_path, os.O_WRONLY | os.O_CREAT)
+    for current_relative_path in relative_paths:
 
-    current_position: int = 0
-    while current_position < file_size:
+        tree_progress_listener.next(current_relative_path)
 
-        chunk_size = os.sendfile(target_fd, source_fd, offset=current_position, count=block_size)
+        current_source_path = source_path / current_relative_path
+        current_target_path = target_path / current_relative_path
 
-        progress_listener.progress(chunk_size)
+        if current_source_path.is_file():
 
-        current_position += chunk_size
+            copy_file(current_source_path, current_target_path,
+                      progress_listener=file_progress_listener, block_size=block_size)
 
-    os.close(target_fd)
-    os.close(source_fd)
+        elif current_source_path.is_dir():
 
-    target_path.chmod(mode=source_stat.st_mode)
+            current_target_path.mkdir()
+            current_target_path.chmod(current_source_path.stat().st_mode)
 
-    progress_listener.end()
+        else:
 
-    return current_position
+            raise Exception()
+
+    tree_progress_listener.finish()
+
+    return len(relative_paths)
+
