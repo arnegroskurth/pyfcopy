@@ -14,28 +14,31 @@ def list_tree(
         *,
         absolute: Optional[bool] = None,
         order: Optional[Order] = None,
+        include_root: Optional[bool] = None,
 ) -> List[Path]:
 
     path = Path(path) if not isinstance(path, Path) else path
 
     absolute = False if absolute is None else absolute
     order = Order.PRE if order is None else order
-
-    if not path.is_dir():
-        raise ValueError(f"Given path is not a directory: {path}")
+    include_root = True if include_root is None else include_root
 
     if order not in [Order.PRE, Order.POST]:
         raise ValueError(f"Invalid order.")
 
-    paths = list(path.rglob("*"))
+    if path.is_dir():
 
-    if not absolute:
+        paths = list(path.rglob("*"))
 
-        # trim absolute to relative paths
-        paths = [
-            absolute_path.relative_to(path)
-            for absolute_path in paths
-        ]
+        if include_root:
+            paths.append(path)
+
+    elif path.is_file():
+
+        paths = [path]
+
+    else:
+        raise ValueError(f"Given path does not exist: {path}")
 
     if order == Order.PRE:
 
@@ -48,5 +51,13 @@ def list_tree(
     else:
 
         raise Exception()
+
+    if not absolute:
+
+        # trim absolute to relative paths
+        paths = [
+            absolute_path.relative_to(path)
+            for absolute_path in paths
+        ]
 
     return paths
