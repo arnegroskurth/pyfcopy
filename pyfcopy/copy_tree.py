@@ -4,6 +4,7 @@ from typing import Optional, Union
 
 from pyfcopy import copy
 from pyfcopy.dummy_progress import DummyTreeProgressListener
+from pyfcopy.list_tree import list_tree, Order
 from pyfcopy.progress import TreeProgressListener, FileProgressListener
 
 
@@ -21,8 +22,8 @@ def copy_tree(
 
     tree_progress_listener = DummyTreeProgressListener() if tree_progress_listener is None else tree_progress_listener
 
-    if not source_path.is_dir():
-        raise ValueError(f"Given source-path is not a directory: {source_path}")
+    if not source_path.exists():
+        raise ValueError(f"Given source-path does not exist: {source_path}")
 
     if source_path.is_symlink():
         raise ValueError(f"Given source-path is a symlink: {source_path}")
@@ -33,15 +34,9 @@ def copy_tree(
     if str(target_path.resolve()).startswith(str(source_path.resolve())):
         raise ValueError("Cannot copy tree into itself.")
 
-    relative_paths = [
-        str(absolute_path.relative_to(source_path))
-        for absolute_path in source_path.rglob("*")
-    ]
+    relative_paths = list_tree(source_path, order=Order.PRE)
 
     tree_progress_listener.begin(relative_paths)
-
-    target_path.mkdir()
-    target_path.chmod(source_path.stat().st_mode)
 
     for current_relative_path in relative_paths:
 
