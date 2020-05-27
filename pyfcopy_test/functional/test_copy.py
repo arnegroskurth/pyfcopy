@@ -4,10 +4,6 @@ from pathlib import Path
 import pytest
 
 from pyfcopy import copy
-from pyfcopy_test.file_progress_listener_tester import FileProgressListenerTester
-from pyfcopy_test.tree_equality import assert_equal_trees
-from pyfcopy_test.tree_fixture import prepare_tree
-from pyfcopy_test.tree_progress_listener_tester import TreeProgressListenerTester
 
 
 def test_copy_file(tmp_path: Path):
@@ -30,42 +26,21 @@ def test_copy_dir(tmp_path: Path):
 
 def test_copy_tree(tmp_path: Path):
 
-    prepare_tree(
-        tmp_path,
-        directory_map={
-            "src": 0o771,
-            "src/empty": 0o777,
-            "src/sub1": 0o775,
-            "src/sub2": 0o755,
-            "src/sub2/sub21": 0o757,
-        },
-        file_map={
-            "src/a.ext": 0o777,
-            "src/sub1/b.ext": 0o775,
-            "src/sub2/sub21/c.ext": 0o757,
-        }
-    )
+    (tmp_path / "dir").mkdir()
+    (tmp_path / "dir/file1").touch()
+    (tmp_path / "dir/subdir1").mkdir()
+    (tmp_path / "dir/subdir1/file2").touch()
+    (tmp_path / "dir/subdir1/file3").touch()
+    (tmp_path / "dir/subdir2").mkdir()
 
-    source = tmp_path / "src"
-    target = tmp_path / "target"
+    copy(tmp_path / "dir", tmp_path / "target")
 
-    tree_progress_listener = TreeProgressListenerTester({
-        ".", "empty", "sub1", "sub2", "sub2/sub21",
-        "a.ext", "sub1/b.ext", "sub2/sub21/c.ext",
-    })
-    file_progress_listener = FileProgressListenerTester()
-
-    copy(
-        str(source),
-        str(target),
-        tree_progress_listener=tree_progress_listener,
-        file_progress_listener=file_progress_listener
-    )
-
-    assert_equal_trees(source, target)
-
-    tree_progress_listener.assert_consistent_run()
-    file_progress_listener.assert_consistent_run()
+    assert (tmp_path / "target").is_dir()
+    assert (tmp_path / "target/file1").is_file()
+    assert (tmp_path / "target/subdir1").is_dir()
+    assert (tmp_path / "target/subdir1/file2").is_file()
+    assert (tmp_path / "target/subdir1/file3").is_file()
+    assert (tmp_path / "target/subdir2").is_dir()
 
 
 @pytest.mark.parametrize("relative_path", [".", "..", "non-existent", "a-file-symlink", "a-dir-symlink"])
